@@ -16,8 +16,10 @@ $(document).ready(function(){
 	};
 
 	function displaySearchInfo(){
+		var filmTitle = $(this).attr("data-name");
 
-		about = $(this).attr("data-queryTerm");
+		var about = getMovieQuery(filmTitle);
+
 		var queryURL = "https://api.giphy.com/v1/gifs/search?q="+about+"&api_key=B2fYI43Qg9B2HN4hQAVX7I5IBNO95NVZ&limit=10"
 
 
@@ -33,28 +35,16 @@ $(document).ready(function(){
 				var topicImage = $("<img>");
 				topicImage.addClass("gif");
 				topicImage.attr("src", results[i].images.fixed_height_still.url);
-				topicImage.attr("data-number", [i]);
+				topicImage.attr("data-still", results[i].images.fixed_height_still.url);
+				topicImage.attr("data-animate", results[i].images.fixed_height.url);
 				topicImage.attr("data-state", "still");
 				topicDiv.append(rating);
 				topicDiv.append(topicImage);
 				$("#collection").prepend(topicDiv);
 
-			};
+			}
 
-			$(document.body).on("click",".gif", function(){
-				var state = $(this).attr("data-state");
-				var number = $(this).attr("data-number");
-				console.log($(this).attr("src"));
-				if (state === "still") {
-					$(this).attr("src", results[number].images.fixed_height.url);
-					$(this).attr("data-state", "animate");
-				} else {
-					$(this).attr("src", results[number].images.fixed_height_still.url);
-					$(this).attr("data-state", "still");
-				}
-
-
-			});
+			
 
 		})
 
@@ -72,17 +62,34 @@ $(document).ready(function(){
 	$("#add-movie").on("click", addDisney);
 
 
-	$(document.body).on("click", ".select", function(){
-		var filmTitle = $(this).attr("data-name");
+	function getMovieQuery(filmTitle){
 		var rearrange = filmTitle.split(" ");
 		var queryMovie = "";
 		for (var i = 0; i < rearrange.length; i++) {
 			queryMovie += rearrange[i] + "+";
-			var query = queryMovie.slice(0,-1); 
-			$(this).attr("data-queryTerm", query);
 		};
 
-	})
+		var query = queryMovie.slice(0,-1); 
+
+		return query;
+
+	}
+
+	$(document.body).on("click",".gif", function(){
+				var state = $(this).attr("data-state");
+				var static = $(this).attr("data-still");
+				var dynamic = $(this).attr("data-animate");
+				console.log($(this).attr("src"));
+				if (state === "still") {
+					$(this).attr("src", dynamic);
+					$(this).attr("data-state", "animate");
+				} else {
+					$(this).attr("src", static);
+					$(this).attr("data-state", "still");
+				}
+
+
+			});
 
 	$(document.body).on("click", ".select", displaySearchInfo);
 
